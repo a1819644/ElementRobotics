@@ -194,7 +194,7 @@ class Ui_MainWindow_STIM300(object):
                 self.serial_port.write(data_to_send.encode('utf-8'))
                 QtCore.QCoreApplication.processEvents()  # Process events to keep the GUI responsive
 
-            while self.serial_port.waitForReadyRead(1000):
+            
                 data_receive = self.serial_port.readAll().data().decode('utf-8')
                 part_number_match = re.search(r'Part Number datagram:([A-F0-9]+)', data_receive)
 
@@ -209,7 +209,7 @@ class Ui_MainWindow_STIM300(object):
                     self.textBrowser_3.append(ammending_info)
                     # Move cursor to the end
                     self.textBrowser_3.moveCursor(QtGui.QTextCursor.End)
-                    break
+                    
 
     def requestserialnumber(self):
         if self.radioButton.isChecked():  # Check if Normal Mode is activated
@@ -217,8 +217,8 @@ class Ui_MainWindow_STIM300(object):
                 data_to_send = "I"
                 self.serial_port.write(data_to_send.encode('utf-8'))
                 QtCore.QCoreApplication.processEvents()  # Process events to keep the GUI responsive
-
-            while self.serial_port.waitForReadyRead(1000):
+        
+            
                 data_receive = self.serial_port.readAll().data().decode('utf-8')
                 serial_number_match = re.search(r'Serial number Datagram:([A-F0-9]+)', data_receive)
 
@@ -233,7 +233,7 @@ class Ui_MainWindow_STIM300(object):
                     self.textBrowser_3.append(ammending_info)
                     # Move cursor to the end
                     self.textBrowser_3.moveCursor(QtGui.QTextCursor.End)
-                    break
+                    
 
     def request_config_datagram(self):
         if self.radioButton.isChecked():  # Check if Normal Mode is activated
@@ -242,7 +242,6 @@ class Ui_MainWindow_STIM300(object):
                 self.serial_port.write(data_to_send.encode('utf-8'))
                 QtCore.QCoreApplication.processEvents()  # Process events to keep the GUI responsive
 
-            while self.serial_port.waitForReadyRead(1000):
                 data_receive = self.serial_port.readAll().data().decode('utf-8')
                 config_match = re.search(r'configuration Datagram:b\'(.*?)\'', data_receive)
 
@@ -257,7 +256,7 @@ class Ui_MainWindow_STIM300(object):
                     self.textBrowser_3.append(ammending_info)
                     # Move cursor to the end
                     self.textBrowser_3.moveCursor(QtGui.QTextCursor.End)
-                    break
+                    
 
     def request_bias_trim_offs(self):
         if self.radioButton.isChecked():  # Check if Normal Mode is activated
@@ -265,13 +264,8 @@ class Ui_MainWindow_STIM300(object):
                 data_to_send = "T"
                 self.serial_port.write(data_to_send.encode('utf-8'))
                 QtCore.QCoreApplication.processEvents()  # Process events to keep the GUI responsive
-
-
-            while self.serial_port.waitForReadyRead(1000):
                 data_receive = self.serial_port.readAll().data().decode('utf-8')
                 request_bias_trim_offs_data = re.search(r'bias Trim Offset Datagram:b\'(.*?)\'', data_receive)
-
-
                 if request_bias_trim_offs_data:
                     part_number = request_bias_trim_offs_data.group(1)
                     print("Extracted bias Trim Offset Datagram:", part_number)
@@ -282,7 +276,7 @@ class Ui_MainWindow_STIM300(object):
                     self.textBrowser_3.append(ammending_info)
                     # Move cursor to the end
                     self.textBrowser_3.moveCursor(QtGui.QTextCursor.End)
-                    break
+                    
 
     def reset_unit(self):
         #todo: this function needs implementation
@@ -379,15 +373,12 @@ class Ui_MainWindow_STIM300(object):
                 """
         return stim300_data
 
-
-
     def servioceModeActivateToggled(self, checked):
         if checked:
             self.textBrowser_2.clear()
             service_mode_data = self.service_mode_data_fun()
             self.textBrowser_2.append(service_mode_data)
  
-
     def serviceModeDeactivateToggled(self, checked):
         if checked:
             self.textBrowser_2.clear()
@@ -399,7 +390,6 @@ class Ui_MainWindow_STIM300(object):
     def readData(self):
         if self.radioButton_6.isChecked():
                 data = self.serial_port.readAll().data().decode('utf-8')  # Read data from serial port
-
                 if data:
                         # Print received data for debugging
                         print("Received data:", data)

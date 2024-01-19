@@ -289,17 +289,25 @@ def main():
     # virtual serial port
     port_name = 'COM9'  # Change this to your desired port
     baud_rate = 115200
-    
+    command_received = True
+    table = PrettyTable()
     try:
         ser = serial.Serial(port_name, baud_rate, timeout=1)
         print(f"Serial port {port_name} opened successfully.")
     except serial.SerialException as e:
         print(f"Error opening serial port: {e}")
         return
+    
 
     try:
+        table = simulate_stim300_data(ser)
         while True:
-            table = simulate_stim300_data(ser)
+            # If a command has been received, execute simulate_stim300_data(ser) once
+            if command_received:
+                print(table)
+                command_received = False  # Reset the flag after executing simulate_stim300_data(ser)
+
+ 
             # Check for incoming command from receiver
             while ser.in_waiting > 0:
                 command_input_from_receiver = ser.readline().decode('utf-8')
@@ -320,7 +328,10 @@ def main():
                     print(datagram_content)
                     sending_data = datagram_content.encode('utf-8') 
                     ser.write(sending_data)
-            time.sleep(1)
+                command_received = True
+
+            # time.sleep(1)       
+            
 
 
     except KeyboardInterrupt:
