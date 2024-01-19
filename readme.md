@@ -8,8 +8,11 @@ The STIM300 Simulator is a Python script that simulates data transmission for th
    ```bash
    git clone https://github.com/a1819644/ElementRobotics.git
    cd stim300-simulator
+
 2. **Install dependencies:**
+
     ```pip install -r requirements.txt
+
 3. **Run the simulators**
     Note: make sure to change the port numbers 
     ```datagram.py
