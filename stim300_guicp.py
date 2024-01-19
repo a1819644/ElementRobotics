@@ -1,5 +1,3 @@
-
-
 import re
 import time
 from PyQt5.QtCore import QThread, pyqtSignal
@@ -7,8 +5,11 @@ from PyQt5 import QtCore, QtGui, QtWidgets, QtSerialPort
 
 
 class Ui_MainWindow_STIM300(object):
-    global serial_mode_datagram_global, part_number_datagram_global, fw_config_global
+
     def setupUi(self, MainWindow_STIM300):
+        self.part_number_datagram_global = None
+        self.serial_mode_datagram_global = None
+        self.fw_config_global = None
         # current mode button
         self.current_mode = "Deactivate" # in the beginning
         MainWindow_STIM300.setObjectName("MainWindow_STIM300")
@@ -200,7 +201,7 @@ class Ui_MainWindow_STIM300(object):
 
                 if part_number_match:
                     part_number = part_number_match.group(1)
-                    ui.part_number_datagram_global = part_number
+                    self.part_number_datagram_global = part_number
                     print("Extracted Part Number:", part_number)
                     # Clear existing data
                     self.textBrowser_3.clear()
@@ -210,7 +211,6 @@ class Ui_MainWindow_STIM300(object):
                     # Move cursor to the end
                     self.textBrowser_3.moveCursor(QtGui.QTextCursor.End)
                     
-
     def requestserialnumber(self):
         if self.radioButton.isChecked():  # Check if Normal Mode is activated
             if self.radioButton.isChecked():  # Check if Normal Mode is activated
@@ -224,7 +224,7 @@ class Ui_MainWindow_STIM300(object):
 
                 if serial_number_match:
                     part_number = serial_number_match.group(1)
-                    ui.serial_mode_datagram_global = part_number
+                    self.serial_mode_datagram_global = part_number
                     print("Extracted Serial Number:", part_number)
                     # Clear existing data
                     self.textBrowser_3.clear()
@@ -234,7 +234,6 @@ class Ui_MainWindow_STIM300(object):
                     # Move cursor to the end
                     self.textBrowser_3.moveCursor(QtGui.QTextCursor.End)
                     
-
     def request_config_datagram(self):
         if self.radioButton.isChecked():  # Check if Normal Mode is activated
             if self.radioButton.isChecked():  # Check if Normal Mode is activated
@@ -247,7 +246,7 @@ class Ui_MainWindow_STIM300(object):
 
                 if config_match:
                     part_number = config_match.group(1)
-                    ui.fw_config_global = part_number
+                    self.fw_config_global = part_number
                     print("Extracted Config datagram:", part_number)
                     # Clear existing data
                     self.textBrowser_3.clear()
@@ -257,7 +256,6 @@ class Ui_MainWindow_STIM300(object):
                     # Move cursor to the end
                     self.textBrowser_3.moveCursor(QtGui.QTextCursor.End)
                     
-
     def request_bias_trim_offs(self):
         if self.radioButton.isChecked():  # Check if Normal Mode is activated
             if self.radioButton.isChecked():  # Check if Normal Mode is activated
@@ -275,8 +273,7 @@ class Ui_MainWindow_STIM300(object):
                     ammending_info = f"Requested bias trim offset Datagram: {part_number}"
                     self.textBrowser_3.append(ammending_info)
                     # Move cursor to the end
-                    self.textBrowser_3.moveCursor(QtGui.QTextCursor.End)
-                    
+                    self.textBrowser_3.moveCursor(QtGui.QTextCursor.End)             
 
     def reset_unit(self):
         #todo: this function needs implementation
@@ -299,12 +296,12 @@ class Ui_MainWindow_STIM300(object):
     def service_mode_data_fun(self):
         
         stim300_data = """
-                SERIAL NUMBER = {serial_number}
+                SERIAL NUMBER = {}
                 PRODUCT = STIM300
-                PART NUMBER = {part_number}
-                FW CONFIG = {fw_config}
-                GYRO OUTPUT UNIT = [°/s] – ANGULAR RATE DELAYED
-                ACCELEROMETER OUTPUT UNIT = [g] – ACCELERATION
+                PART NUMBER = {}
+                FW CONFIG = {}
+                GYRO OUTPUT UNIT = [°/s] : ANGULAR RATE DELAYED
+                ACCELEROMETER OUTPUT UNIT = [g] : ACCELERATION
                 INCLINOMETER OUTPUT UNIT = [g] - ACCELERATION
                 SAMPLE RATE [samples/s] = 2000
                 GYRO CONFIG = XYZ
@@ -370,7 +367,11 @@ class Ui_MainWindow_STIM300(object):
                 VOLTAGE-LEVEL OF DIGITAL OUTPUT SIGNALS: 5V
                 TOV ACTIVE FOR SPECIAL DATAGRAMS AFTER POWER-ON/RESET: OFF
                 BTO-DATAGRAM TRANSMISSION AFTER POWER-ON/RESET: OFF
-                """
+                """.format(
+        self.serial_mode_datagram_global,
+        self.part_number_datagram_global,
+        self.fw_config_global
+         )
         return stim300_data
 
     def servioceModeActivateToggled(self, checked):
@@ -383,7 +384,6 @@ class Ui_MainWindow_STIM300(object):
         if checked:
             self.textBrowser_2.clear()
             self.textBrowser_2.append("Service Mode Deactivated")
-
 
 
     # read data for automode text browser    
@@ -399,14 +399,25 @@ class Ui_MainWindow_STIM300(object):
                         self.textBrowser.append(data)
                         # Move cursor to the end
                         self.textBrowser.moveCursor(QtGui.QTextCursor.End)
+                        
                 else:
                         print("No data received.")
 
     def autoModeRadioButtonToggled(self, checked):
         if checked:
+
+            self.textBrowser.clear()
+            # Append new data
+            self.textBrowser.append("Automode is activated")
             # Auto Mode radio button is checked, enable reading and displaying data
+            data_to_send = "AutomodeON"
+            self.serial_port.write(data_to_send.encode('utf-8'))
             self.serial_port.readyRead.connect(self.readData)
+            
         else:
+            self.textBrowser.clear()
+            # Append new data
+            self.textBrowser.append("Automode is deactivated")
             # Auto Mode radio button is unchecked, disconnect the readyRead signal
             self.serial_port.readyRead.disconnect(self.readData)
 

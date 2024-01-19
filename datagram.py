@@ -44,10 +44,10 @@ def simulate_stim300_data(serial_port):
     for row in datagram_data:
         table.add_row(row)
 
-    # print(table)
-    datagram = table.get_string().encode('utf-8')
-    # send datagram
-    serial_port.write(datagram)
+    # # print(table)
+    # datagram = table.get_string().encode('utf-8')
+    # # send datagram
+    # serial_port.write(datagram)
     return table
 
 
@@ -303,14 +303,18 @@ def main():
         table = simulate_stim300_data(ser)
         while True:
             # If a command has been received, execute simulate_stim300_data(ser) once
-            if command_received:
-                print(table)
-                command_received = False  # Reset the flag after executing simulate_stim300_data(ser)
-
- 
             # Check for incoming command from receiver
             while ser.in_waiting > 0:
                 command_input_from_receiver = ser.readline().decode('utf-8')
+                if command_received == True and command_input_from_receiver in "AutomodeON":
+                    # print(table)
+                    datagram = table.get_string().encode('utf-8')
+                    # send datagram
+                    ser.write(datagram)
+                    print(table)
+                    command_received = False  # Reset the flag after executing simulate_stim300_data(ser)
+            
+                # command_input_from_receiver = ser.readline().decode('utf-8')
                 if command_input_from_receiver in ['N', 'I', 'C', 'T', 'E', 'R']:  # Example: 'R' for requesting data
                     # sending data to receiver
                     datagram_content,part_number = switch(command_input_from_receiver)
