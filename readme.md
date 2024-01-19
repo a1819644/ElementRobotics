@@ -6,7 +6,7 @@ The STIM300 Simulator is a Python script that simulates data transmission for th
 
 1. **Clone the Repository:**
    ```bash
-   git clone https://github.com/yourusername/stim300-simulator.git
+   git clone https://github.com/a1819644/ElementRobotics.git
    cd stim300-simulator
 2. **Install dependencies:**
     ```pip install -r requirements.txt
